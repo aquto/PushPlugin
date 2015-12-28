@@ -15,6 +15,10 @@ import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
 
+import android.content.pm.PackageManager;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
+
 @SuppressLint("NewApi")
 public class GCMIntentService extends GCMBaseIntentService {
 
@@ -70,13 +74,23 @@ public class GCMIntentService extends GCMBaseIntentService {
 			}
 			else {
 				extras.putBoolean("foreground", false);
-
+								extras.putString("title", getAppLable(context));
                 // Send a notification if there is a message
                 if (extras.getString("message") != null && extras.getString("message").length() != 0) {
                     createNotification(context, extras);
                 }
             }
         }
+	}
+
+	public String getAppLable(Context pContext) {
+	    PackageManager lPackageManager = pContext.getPackageManager();
+	    ApplicationInfo lApplicationInfo = null;
+	    try {
+	        lApplicationInfo = lPackageManager.getApplicationInfo(pContext.getApplicationInfo().packageName, 0);
+	    } catch (final NameNotFoundException e) {
+	    }
+	    return (String) (lApplicationInfo != null ? lPackageManager.getApplicationLabel(lApplicationInfo) : "Unknown");
 	}
 
 	public void createNotification(Context context, Bundle extras)
